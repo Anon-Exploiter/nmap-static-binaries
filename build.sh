@@ -4,6 +4,7 @@ set -e
 set -o pipefail
 set -x
 
+
 NMAP_VERSION=7.80
 OPENSSL_VERSION=1.1.0h
 
@@ -12,23 +13,20 @@ rm -rfv /etc/apt/sources.list
 echo "deb http://archive.debian.org/debian-security jessie/updates main" >> /etc/apt/sources.list.d/jessie.list
 echo "deb http://archive.debian.org/debian jessie main" >> /etc/apt/sources.list.d/jessie.list
 
-
 # Install Python and zip
-DEBIAN_FRONTEND=noninteractive apt-get update -y
-DEBIAN_FRONTEND=noninteractive apt-get install -yy --force-yes python zip automake
+DEBIAN_FRONTEND=noninteractive apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -yy python zip
 
-# Create build dir for workflows
-mkdir -p /build
 
 function build_openssl() {
     cd /build
 
-    # Download OpenSSL
-    curl -LO https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz -k
+    # Download
+    curl -LO https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
     tar zxvf openssl-${OPENSSL_VERSION}.tar.gz
     cd openssl-${OPENSSL_VERSION}
 
-    # Configure OpenSSL
+    # Configure
     CC='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static' ./Configure no-shared no-async linux-x86_64
 
     # Build
@@ -39,14 +37,10 @@ function build_openssl() {
 function build_nmap() {
     cd /build
 
-    # Download Nmap
-    curl -LO http://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2 -k
+    # Download
+    curl -LO http://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2
     tar xjvf nmap-${NMAP_VERSION}.tar.bz2
-    mv nmap-${NMAP_VERSION} nmap
-    
-    # # Get latest version of Nmap
-    # git clone https://github.com/nmap/nmap.git --depth 1
-	# cd nmap
+    cd nmap-${NMAP_VERSION}
 
     # Configure
     CC='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static -fPIC' \
@@ -67,9 +61,6 @@ function build_nmap() {
 
     # Build
     make -j4
-    echo $?
-
-    ls -la /build/nmap/nmap-*
     /opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-strip nmap ncat/ncat nping/nping
 }
 
@@ -82,21 +73,11 @@ function doit() {
     then
         OUT_DIR=/output/`uname | tr 'A-Z' 'a-z'`/`uname -m`
         mkdir -p $OUT_DIR
-        cp /build/nmap/nmap $OUT_DIR/
-        cp /build/nmap/ncat/ncat $OUT_DIR/
-
-        rm -rfv /build/nmap/nmap-header-template.cc
-        cp /build/nmap/nmap-* $OUT_DIR/
-
-        # cp /build/nmap/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/
-
-        NMAP_VERSION=$(/build/nmap/nmap | head -n 1 | cut -d " " -f2)
-        zip -r "/output/nmap-static-binaries-$NMAP_VERSION.zip" $OUT_DIR
-
-        # Also storing the build files and shit
-        zip -r "/output/nmap-build-files-$NMAP_VERSION.zip" "/build/" "/output/"
-
-
+        cp /build/nmap-${NMAP_VERSION}/nmap $OUT_DIR/
+        cp /build/nmap-${NMAP_VERSION}/ncat/ncat $OUT_DIR/
+        cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/
+        cd $OUT_DIR/
+        zip nmap-static-${NMAP_VERSION}.zip {nmap-os-db,nmap-payloads,nmap-rpc}
         echo "** Finished **"
     else
         echo "** /output does not exist **"
