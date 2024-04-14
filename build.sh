@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 set -x
 
-
+NMAP_VERSION=7.80
 OPENSSL_VERSION=1.1.0h
 
 # Fix jessie repo
@@ -15,7 +15,7 @@ echo "deb http://archive.debian.org/debian jessie main" >> /etc/apt/sources.list
 
 # Install Python and zip
 DEBIAN_FRONTEND=noninteractive apt-get update -y
-DEBIAN_FRONTEND=noninteractive apt-get install -yy --force-yes python zip
+DEBIAN_FRONTEND=noninteractive apt-get install -yy --force-yes python zip automake
 
 # Create build dir for workflows
 mkdir -p /build
@@ -39,14 +39,14 @@ function build_openssl() {
 function build_nmap() {
     cd /build
 
-    # Download
-    # curl -LO http://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2 -k
-    # tar xjvf nmap-${NMAP_VERSION}.tar.bz2
-    # cd nmap-${NMAP_VERSION}
+    # Download Nmap
+    curl -LO http://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2 -k
+    tar xjvf nmap-${NMAP_VERSION}.tar.bz2
+    mv nmap-${NMAP_VERSION} nmap
     
-    # Get latest version of Nmap
-    git clone https://github.com/nmap/nmap.git --depth 1
-	cd nmap
+    # # Get latest version of Nmap
+    # git clone https://github.com/nmap/nmap.git --depth 1
+	# cd nmap
 
     # Configure
     CC='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static -fPIC' \
