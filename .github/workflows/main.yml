@@ -17,10 +17,11 @@ jobs:
 
               with:
                 image: andrewd/musl-cross:latest
+                shell: bash
                 options: -v ${{ github.workspace }}:/output
                 run: |
                     set -e
-                    # set -o pipefail
+                    set -o pipefail
                     set -x
                     
                     
