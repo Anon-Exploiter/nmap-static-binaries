@@ -8,9 +8,6 @@ NMAP_VERSION=workflow_fills_me
 DATE_TIME="fill_me_daddy"
 OPENSSL_VERSION=1.1.0h
 
-echo $NMAP_VERSION
-echo $DATE_TIME
-
 # Fix jessie repo
 rm -rfv /etc/apt/sources.list
 echo "deb http://archive.debian.org/debian-security jessie/updates main" >> /etc/apt/sources.list.d/jessie.list
