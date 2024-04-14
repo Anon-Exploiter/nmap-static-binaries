@@ -28,6 +28,12 @@ jobs:
                     #NMAP_VERSION=7.91
                     # Nmap is bleeding edge from git
                     OPENSSL_VERSION=1.1.1q
+
+                    id
+                    whoami
+                    
+                    mkdir -p /build
+                    mkdir -p /output
                     
                     
                     function build_openssl() {
