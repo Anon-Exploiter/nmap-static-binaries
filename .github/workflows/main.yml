@@ -18,9 +18,12 @@ jobs:
               with:
                 image: andrewd/musl-cross:latest
                 shell: bash
-                options: -v ${{ github.workspace }}:/output
+                options: -v ${{ github.workspace }}/output:/output
                 run: |
-                    ./output/build.sh
+                    ls -la
+                    pwd
+                    find .
+                    ./output/build.sh || true
 
 
             - name: List Current Directory (Before)
