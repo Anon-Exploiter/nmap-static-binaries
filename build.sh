@@ -4,23 +4,30 @@ set -e
 set -o pipefail
 set -x
 
-mkdir -p /build
+
+OPENSSL_VERSION=1.1.0h
+
+# Fix jessie repo
+rm -rfv /etc/apt/sources.list
+echo "deb http://archive.debian.org/debian-security jessie/updates main" >> /etc/apt/sources.list.d/jessie.list
+echo "deb http://archive.debian.org/debian jessie main" >> /etc/apt/sources.list.d/jessie.list
 
 
-#NMAP_VERSION=7.91
-# Nmap is bleeding edge from git
-OPENSSL_VERSION=1.1.1q
+# Install Python and zip
+DEBIAN_FRONTEND=noninteractive apt-get update -y
+DEBIAN_FRONTEND=noninteractive apt-get install -yy --force-yes python zip
+
 
 function build_openssl() {
     cd /build
 
-    # Download
-    curl -LOk https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
+    # Download OpenSSL
+    curl -LO https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz -k
     tar zxvf openssl-${OPENSSL_VERSION}.tar.gz
     cd openssl-${OPENSSL_VERSION}
 
-    # Configure
-    CC='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static' ./Configure no-shared linux-x86_64
+    # Configure OpenSSL
+    CC='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static' ./Configure no-shared no-async linux-x86_64
 
     # Build
     make
@@ -30,12 +37,13 @@ function build_openssl() {
 function build_nmap() {
     cd /build
 
-    # Install Python
-    # DEBIAN_FRONTEND=noninteractive apt-get update
-    # DEBIAN_FRONTEND=noninteractive apt-get install -yy python
-
-
-	git clone https://github.com/nmap/nmap.git --depth 1
+    # Download
+    # curl -LO http://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2 -k
+    # tar xjvf nmap-${NMAP_VERSION}.tar.bz2
+    # cd nmap-${NMAP_VERSION}
+    
+    # Get latest version of Nmap
+    git clone https://github.com/nmap/nmap.git --depth 1
 	cd nmap
 
     # Configure
@@ -43,16 +51,17 @@ function build_nmap() {
         CXX='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-g++ -static -static-libstdc++ -fPIC' \
         LD=/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-ld \
         LDFLAGS="-L/build/openssl-${OPENSSL_VERSION}"   \
+        CPPFLAGS="-I/build/openssl-${OPENSSL_VERSION}/include" \
         ./configure \
             --without-ndiff \
             --without-zenmap \
+            --without-subversion \
             --without-nmap-update \
             --with-pcap=linux \
             --with-openssl=/build/openssl-${OPENSSL_VERSION}
 
     # Don't build the libpcap.so file
     sed -i -e 's/shared\: /shared\: #/' libpcap/Makefile
-	sed -i -e 's/shared\: /shared\: #/' libz/Makefile
 
     # Build
     make -j4
@@ -67,15 +76,22 @@ function doit() {
     if [ -d /output ]
     then
         OUT_DIR=/output/`uname | tr 'A-Z' 'a-z'`/`uname -m`
-        mkdir -p $OUT_DIR && mkdir -p $OUT_DIR/scripts && mkdir -p $OUT_DIR/nselib
-        #cp /build/nmap-${NMAP_VERSION}/nmap $OUT_DIR/
-        #cp /build/nmap-${NMAP_VERSION}/ncat/ncat $OUT_DIR/
-        #cp /build/nmap-${NMAP_VERSION}/nping/nping $OUT_DIR/
-		cp /build/nmap/nmap $OUT_DIR/
+        mkdir -p $OUT_DIR
+        cp /build/nmap/nmap $OUT_DIR/
         cp /build/nmap/ncat/ncat $OUT_DIR/
-        cp /build/nmap/nping/nping $OUT_DIR/
-		cp /build/nmap/scripts/* $OUT_DIR/scripts/
-		cp -R /build/nmap/nselib/* $OUT_DIR/nselib/
+
+        rm -rfv /build/nmap/nmap-header-template.cc
+        cp /build/nmap/nmap-* $OUT_DIR/
+
+        # cp /build/nmap/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/
+
+        NMAP_VERSION=$(/build/nmap/nmap | head -n 1 | cut -d " " -f2)
+        zip -r "/output/nmap-static-binaries-$NMAP_VERSION.zip" $OUT_DIR
+
+        # Also storing the build files and shit
+        zip -r "/output/nmap-build-files-$NMAP_VERSION.zip" "/build/" "/output/"
+
+
         echo "** Finished **"
     else
         echo "** /output does not exist **"
