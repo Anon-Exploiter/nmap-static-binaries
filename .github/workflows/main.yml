@@ -1,7 +1,6 @@
 name: Generate and release Nmap build
 
-on:
-  workflow_dispatch
+on: push
 
 jobs:
     build:
