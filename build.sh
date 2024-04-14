@@ -77,6 +77,7 @@ function doit() {
         cp /build/nmap-${NMAP_VERSION}/nmap $OUT_DIR/
         cp /build/nmap-${NMAP_VERSION}/ncat/ncat $OUT_DIR/
         cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/ || true
+        rm -rfv /build/nmap-${NMAP_VERSION}/nmap-${NMAP_VERSION}-1.spec || true
         cp /build/nmap-${NMAP_VERSION}/nmap-* $OUT_DIR/ || true
     
         # Need these two for sC/sV
