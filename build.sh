@@ -76,18 +76,13 @@ function doit() {
 
         cp /build/nmap-${NMAP_VERSION}/nmap $OUT_DIR/
         cp /build/nmap-${NMAP_VERSION}/ncat/ncat $OUT_DIR/
-        # cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/
+        cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/ || true
+        zip -r "/output/nmap-static-binaries-$NMAP_VERSION.zip" $OUT_DIR || true
 
-        rm -rfv /build/nmap-${NMAP_VERSION}/nmap-header-template.cc
-        cp -rv /build/nmap-${NMAP_VERSION}/* $OUT_DIR/
+        # rm -rfv /build/nmap-${NMAP_VERSION}/nmap-header-template.cc
+        cp /build/nmap-${NMAP_VERSION}/nmap-* $OUT_DIR/ || true
+        zip -r "/output/nmap-build-files-$NMAP_VERSION.zip" "/build/" "/output/" || true
 
-        # cp /build/nmap/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/
-        # NMAP_VERSION=$(/build/nmap/nmap | head -n 1 | cut -d " " -f2)
-
-        zip -r "/output/nmap-static-binaries-$NMAP_VERSION.zip" $OUT_DIR
-    
-        # Also storing the build files and shit
-        zip -r "/output/nmap-build-files-$NMAP_VERSION.zip" "/build/" "/output/"
 
         echo "** Finished **"
     else
