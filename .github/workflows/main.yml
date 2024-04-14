@@ -5,7 +5,7 @@ on:
 
 jobs:
     build:
-        runs-on: andrewd/musl-cross
+        runs-on: ubuntu:20.04
 
         steps:
             - name: Checkout the code
@@ -23,11 +23,10 @@ jobs:
                   uname -a
                   cat /etc/*release
 
-            # - name: Install dependencies
-            #   run: |
-            #       python -m pip install --upgrade pip
-            #       pip install flake8 pylint
-            #       if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+            - name: Install dependencies
+              run: |
+                  sudo apt-get -y update
+                  sudo apt-get install -y musl-gcc gcc-multilib musl-tools openssl
 
             - name: Build openssl/nmap
               # working-directory: /output/
@@ -37,9 +36,6 @@ jobs:
                   set -o pipefail
                   set -x
                   
-                  
-                  #NMAP_VERSION=7.91
-                  # Nmap is bleeding edge from git
                   OPENSSL_VERSION=1.1.1q
 
                   MAIN_DIR=`pwd`
@@ -59,7 +55,7 @@ jobs:
                       cd openssl-${OPENSSL_VERSION}
                   
                       # Configure
-                      CC='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static' ./Configure no-shared linux-x86_64
+                      CC='x86_64-linux-musl-gcc -static' ./Configure no-shared linux-x86_64
                   
                       # Build
                       make
@@ -74,20 +70,20 @@ jobs:
                       cd nmap
                   
                       # Configure
-                      CC='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static -fPIC' \
-                          CXX='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-g++ -static -static-libstdc++ -fPIC' \
-                          LD=/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-ld \
-                          LDFLAGS="-L$BUILD_DIR/openssl-${OPENSSL_VERSION}"   \
-                          ./configure \
-                              --without-ndiff \
-                              --without-zenmap \
-                              --without-nmap-update \
-                              --with-pcap=linux \
-                              --with-openssl=$BUILD_DIR/openssl-${OPENSSL_VERSION}
+                      CC='x86_64-linux-musl-gcc -static -fPIC' \
+                      CXX='x86_64-linux-musl-g++ -static -static-libstdc++ -fPIC' \
+                      LD=x86_64-linux-musl-ld \
+                      LDFLAGS="-L$BUILD_DIR/openssl-${OPENSSL_VERSION}"   \
+                      ./configure \
+                          --without-ndiff \
+                          --without-zenmap \
+                          --without-nmap-update \
+                          --with-pcap=linux \
+                          --with-openssl=$BUILD_DIR/openssl-${OPENSSL_VERSION}
                   
                       # Don't build the libpcap.so file
                       sed -i -e 's/shared\: /shared\: #/' libpcap/Makefile
-                    sed -i -e 's/shared\: /shared\: #/' libz/Makefile
+                      sed -i -e 's/shared\: /shared\: #/' libz/Makefile
                   
                       # Build
                       make -j4
