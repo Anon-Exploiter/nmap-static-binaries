@@ -66,7 +66,7 @@ function build_nmap() {
     sed -i -e 's/shared\: /shared\: #/' libpcap/Makefile
 
     # Build
-    make -j4 || true
+    make -j4
     echo $?
 
     ls -la /build/nmap/nmap-*
