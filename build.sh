@@ -22,7 +22,7 @@ function build_openssl() {
     cd /build
 
     # Download
-    curl -LO https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
+    curl -LO https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz -k
     tar zxvf openssl-${OPENSSL_VERSION}.tar.gz
     cd openssl-${OPENSSL_VERSION}
 
@@ -38,7 +38,7 @@ function build_nmap() {
     cd /build
 
     # Download
-    curl -LO http://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2
+    curl -LO http://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2 -k
     tar xjvf nmap-${NMAP_VERSION}.tar.bz2
     cd nmap-${NMAP_VERSION}
 
