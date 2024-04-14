@@ -5,16 +5,113 @@ on:
 
 jobs:
     build:
+        name: Nmap build
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout the code
               uses: actions/checkout@v2
 
-            - name: Set up Python3.11
-              uses: actions/setup-python@v2
+            - name: Run the build process with Docker
+              uses: addnab/docker-run-action@v3
+
               with:
-                  python-version: 3.11
+                image: andrewd/musl-cross:latest
+                options: -v ${{ github.workspace }}:/output
+                run: |
+                    set -e
+                    set -o pipefail
+                    set -x
+                    
+                    
+                    #NMAP_VERSION=7.91
+                    # Nmap is bleeding edge from git
+                    OPENSSL_VERSION=1.1.1q
+                    
+                    
+                    function build_openssl() {
+                        cd /build
+                    
+                        # Download
+                        curl -LOk https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
+                        tar zxvf openssl-${OPENSSL_VERSION}.tar.gz
+                        cd openssl-${OPENSSL_VERSION}
+                    
+                        # Configure
+                        CC='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static' ./Configure no-shared linux-x86_64
+                    
+                        # Build
+                        make
+                        echo "** Finished building OpenSSL"
+                    }
+                    
+                    function build_nmap() {
+                        cd /build
+                    
+                        # Install Python
+                        DEBIAN_FRONTEND=noninteractive apt-get update
+                        DEBIAN_FRONTEND=noninteractive apt-get install -yy python
+                    
+                        # Download
+                        #curl -LOk http://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2
+                        #tar xjvf nmap-${NMAP_VERSION}.tar.bz2
+                        #cd nmap-${NMAP_VERSION}
+                    	git clone https://github.com/nmap/nmap.git
+                    	cd nmap
+                    
+                        # Configure
+                        CC='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc -static -fPIC' \
+                            CXX='/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-g++ -static -static-libstdc++ -fPIC' \
+                            LD=/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-ld \
+                            LDFLAGS="-L/build/openssl-${OPENSSL_VERSION}"   \
+                            ./configure \
+                                --without-ndiff \
+                                --without-zenmap \
+                                --without-nmap-update \
+                                --with-pcap=linux \
+                                --with-openssl=/build/openssl-${OPENSSL_VERSION}
+                    
+                        # Don't build the libpcap.so file
+                        sed -i -e 's/shared\: /shared\: #/' libpcap/Makefile
+                    	sed -i -e 's/shared\: /shared\: #/' libz/Makefile
+                    
+                        # Build
+                        make -j4
+                        /opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-strip nmap ncat/ncat nping/nping
+                    }
+                    
+                    function doit() {
+                        build_openssl
+                        build_nmap
+                    
+                        # Copy to output
+                        if [ -d /output ]
+                        then
+                            OUT_DIR=/output/`uname | tr 'A-Z' 'a-z'`/`uname -m`
+                            mkdir -p $OUT_DIR && mkdir -p $OUT_DIR/scripts && mkdir -p $OUT_DIR/nselib
+                            #cp /build/nmap-${NMAP_VERSION}/nmap $OUT_DIR/
+                            #cp /build/nmap-${NMAP_VERSION}/ncat/ncat $OUT_DIR/
+                            #cp /build/nmap-${NMAP_VERSION}/nping/nping $OUT_DIR/
+                    		cp /build/nmap/nmap $OUT_DIR/
+                            cp /build/nmap/ncat/ncat $OUT_DIR/
+                            cp /build/nmap/nping/nping $OUT_DIR/
+                    		cp /build/nmap/scripts/* $OUT_DIR/scripts/
+                    		cp -R /build/nmap/nselib/* $OUT_DIR/nselib/
+                            echo "** Finished **"
+                        else
+                            echo "** /output does not exist **"
+                        fi
+                    }
+                    
+                    doit
+                    
+
+
+
+
+
+
+
 
             - name: List Current Directory (Before)
               run: |
@@ -22,109 +119,8 @@ jobs:
                   ls -la
                   uname -a
                   cat /etc/*release
+                  find .
 
-            - name: Install dependencies
-              run: |
-                  sudo apt-get -y update
-
-                  sudo add-apt-repository -y main
-                  sudo add-apt-repository -y universe
-                  sudo add-apt-repository -y restricted
-                  sudo add-apt-repository -y multiverse  
-
-                  
-                  sudo apt-get install -y musl-gcc gcc-multilib musl-tools openssl
-
-            - name: Build openssl/nmap
-              # working-directory: /output/
-              run: |
-
-                  set -e
-                  set -o pipefail
-                  set -x
-                  
-                  OPENSSL_VERSION=1.1.1q
-
-                  MAIN_DIR=`pwd`
-                  BUILD_DIR=$MAIN_DIR/build
-                  OUTPUT_DIR=$MAIN_DIR/output
-
-                  mkdir -p $BUILD_DIR
-                  mkdir -p $OUTPUT_DIR
-                  
-                  
-                  function build_openssl() {
-                      cd $BUILD_DIR
-                  
-                      # Download
-                      curl -LOk https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
-                      tar zxvf openssl-${OPENSSL_VERSION}.tar.gz
-                      cd openssl-${OPENSSL_VERSION}
-                  
-                      # Configure
-                      CC='x86_64-linux-musl-gcc -static' ./Configure no-shared linux-x86_64
-                  
-                      # Build
-                      make
-                      echo "** Finished building OpenSSL"
-                  }
-                  
-                  function build_nmap() {
-                      cd $BUILD_DIR
-                      
-                      # Clone NMAP Latest Repo
-                      git clone https://github.com/nmap/nmap.git --depth 1
-                      cd nmap
-                  
-                      # Configure
-                      CC='x86_64-linux-musl-gcc -static -fPIC' \
-                      CXX='x86_64-linux-musl-g++ -static -static-libstdc++ -fPIC' \
-                      LD=x86_64-linux-musl-ld \
-                      LDFLAGS="-L$BUILD_DIR/openssl-${OPENSSL_VERSION}"   \
-                      ./configure \
-                          --without-ndiff \
-                          --without-zenmap \
-                          --without-nmap-update \
-                          --with-pcap=linux \
-                          --with-openssl=$BUILD_DIR/openssl-${OPENSSL_VERSION}
-                  
-                      # Don't build the libpcap.so file
-                      sed -i -e 's/shared\: /shared\: #/' libpcap/Makefile
-                      sed -i -e 's/shared\: /shared\: #/' libz/Makefile
-                  
-                      # Build
-                      make -j4
-                          /opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-strip nmap ncat/ncat nping/nping
-                      }
-                  
-                  function doit() {
-                      build_openssl
-                      build_nmap
-                  
-                      # Copy to 
-                      if [ -d $OUTPUT_DIR ]
-                      then
-                          OUT_DIR=$OUTPUT_DIR/`uname | tr 'A-Z' 'a-z'`/`uname -m`
-                          mkdir -p $OUT_DIR && mkdir -p $OUT_DIR/scripts && mkdir -p $OUT_DIR/nselib
-                          cp $BUILD_DIR/nmap/nmap $OUT_DIR/
-                          cp $BUILD_DIR/nmap/ncat/ncat $OUT_DIR/
-                          cp $BUILD_DIR/nmap/nping/nping $OUT_DIR/
-                          cp $BUILD_DIR/nmap/scripts/* $OUT_DIR/scripts/
-                          cp -R $BUILD_DIR/nmap/nselib/* $OUT_DIR/nselib/
-                          echo "** Finished **"
-                      else
-                          echo "** /output does not exist **"
-                      fi
-                  }
-                  
-                  doit
-
-            - name: List Current Directory
-              run: |
-                  pwd
-                  ls -la
-                  uname -a
-                  cat /etc/*release
 
             # - name: Run the python script with modified find command
             #   run: |
