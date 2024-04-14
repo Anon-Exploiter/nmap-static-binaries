@@ -80,10 +80,13 @@ function doit() {
         cp /build/nmap-${NMAP_VERSION}/ncat/ncat $OUT_DIR/
         cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/ || true
         cp /build/nmap-${NMAP_VERSION}/nmap-* $OUT_DIR/ || true
-        zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}.zip" $OUT_DIR || true
 
+        zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}.zip" $OUT_DIR || true
+
+
+        # zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}.zip" $OUT_DIR || true
         # rm -rfv /build/nmap-${NMAP_VERSION}/nmap-header-template.cc
-        zip -rv "/output/nmap-build-files_v${NMAP_VERSION}_${DATE_TIME}.zip" "/build/" "/output/" || true
+        # zip -rv "/output/nmap-build-files_v${NMAP_VERSION}_${DATE_TIME}.zip" "/build/" "/output/" || true
 
 
         echo "** Finished **"

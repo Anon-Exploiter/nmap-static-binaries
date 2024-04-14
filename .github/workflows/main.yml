@@ -2,6 +2,9 @@ name: Generate and release Nmap build
 
 on: push
 
+env:
+  NMAP_VERSION: '7.94'
+
 jobs:
     build:
         name: Nmap build
@@ -10,6 +13,10 @@ jobs:
         steps:
             - name: Checkout the code
               uses: actions/checkout@v3
+
+            - name: Check environmental variable
+              run: |
+                  echo ${{ env.NMAP_VERSION }}
 
             - name: Build the Docker Image
               run: |
@@ -23,9 +30,7 @@ jobs:
               uses: svenstaro/upload-release-action@v2
               with:
                 repo_token: ${{ secrets.GITHUB_TOKEN }}
-                file: ${{ github.workspace }}/output/*.zip
+                file: ${{ github.workspace }}/output/nmap-static-binaries_v${NMAP_VERSION}.zip
                 asset_name: Nmap Binaries
                 tag: v7.94
-                overwrite: true
                 body: "Nmap Static Binary Release"
-            
