@@ -81,7 +81,12 @@ function doit() {
         cp /build/nmap-${NMAP_VERSION}/ncat/ncat $OUT_DIR/
         cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/ || true
         cp /build/nmap-${NMAP_VERSION}/nmap-* $OUT_DIR/ || true
+    
+        # Need these two for sC/sV
+        cp -rv /build/nmap-${NMAP_VERSION}/scripts $OUT_DIR/ || true
+        cp -rv /build/nmap-${NMAP_VERSION}/nselib $OUT_DIR/ || true
 
+        # zip this shit
         zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}.zip" $OUT_DIR || true
 
 

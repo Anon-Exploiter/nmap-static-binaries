@@ -17,14 +17,6 @@ jobs:
             - name: Set current date as env variable
               run: echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
 
-            - name: Echo current date
-              run: echo $NOW # Gives "2022-12-11T01:42:20"
-        
-
-            # - name: Check environmental variable
-            #   run: |
-            #       echo ${{ env.NMAP_VERSION }}
-
             - name: Build the Docker Image
               run: |
                   sed -i -e 's/workflow_fills_me/${{ env.NMAP_VERSION }}/g' build.sh
