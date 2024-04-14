@@ -10,19 +10,28 @@ jobs:
 
         steps:
             - name: Checkout the code
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
-            - name: Run the build process with Docker
-              uses: addnab/docker-run-action@v3
+            - name: Build the Docker Image
+              run: |
+                  docker build . -t nmap-static
 
-              with:
-                image: andrewd/musl-cross:latest
-                shell: bash
-                options: -v ${{ github.workspace }}:/repo -v ${{ github.workspace }}/output:/output
-                run: |
-                  find ${{ github.workspace }}:/repo
-                  find ${{ github.workspace }}:/output
-                  ./repo/build.sh
+            - name: Run the Docker Image
+              run: |
+                  docker.exe run -it --rm -v ${{ github.workspace }}/output:/output nmap-static
+
+            # - name: Run the build process with Docker
+            #   uses: addnab/docker-run-action@v3
+
+            
+              # with:
+              #   image: andrewd/musl-cross:latest
+              #   shell: bash
+              #   options: -v ${{ github.workspace }}:/repo -v ${{ github.workspace }}/output:/output
+              #   run: |
+              #     find ${{ github.workspace }}:/repo
+              #     find ${{ github.workspace }}:/output
+              #     ./repo/build.sh
 
 
             - name: List Current Directory (Before)
