@@ -70,7 +70,6 @@ function build_nmap() {
     echo $?
 
     ls -la /build/nmap/nmap-*
-
     /opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-strip nmap ncat/ncat nping/nping
 }
 
