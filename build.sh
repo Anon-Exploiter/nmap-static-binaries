@@ -4,8 +4,9 @@ set -e
 set -o pipefail
 set -x
 
+echo $NMAP_VERSION
 
-NMAP_VERSION=7.94
+# NMAP_VERSION=7.94
 OPENSSL_VERSION=1.1.0h
 
 # Fix jessie repo

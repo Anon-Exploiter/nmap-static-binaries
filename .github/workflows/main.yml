@@ -14,9 +14,9 @@ jobs:
             - name: Checkout the code
               uses: actions/checkout@v3
 
-            - name: Check environmental variable
-              run: |
-                  echo ${{ env.NMAP_VERSION }}
+            # - name: Check environmental variable
+            #   run: |
+            #       echo ${{ env.NMAP_VERSION }}
 
             - name: Build the Docker Image
               run: |
