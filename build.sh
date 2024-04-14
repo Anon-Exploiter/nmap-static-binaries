@@ -5,7 +5,7 @@ set -o pipefail
 set -x
 
 
-NMAP_VERSION=7.80
+NMAP_VERSION=7.94
 OPENSSL_VERSION=1.1.0h
 
 # Fix jessie repo
@@ -73,11 +73,22 @@ function doit() {
     then
         OUT_DIR=/output/`uname | tr 'A-Z' 'a-z'`/`uname -m`
         mkdir -p $OUT_DIR
+
         cp /build/nmap-${NMAP_VERSION}/nmap $OUT_DIR/
         cp /build/nmap-${NMAP_VERSION}/ncat/ncat $OUT_DIR/
         cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/
-        cd $OUT_DIR/
-        zip nmap-static-${NMAP_VERSION}.zip {nmap-os-db,nmap-payloads,nmap-rpc}
+
+        rm -rfv /build/nmap/nmap-header-template.cc
+        cp /build/nmap/nmap-* $OUT_DIR/
+
+        # cp /build/nmap/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/
+        # NMAP_VERSION=$(/build/nmap/nmap | head -n 1 | cut -d " " -f2)
+
+        zip -r "/output/nmap-static-binaries-$NMAP_VERSION.zip" $OUT_DIR
+    
+        # Also storing the build files and shit
+        zip -r "/output/nmap-build-files-$NMAP_VERSION.zip" "/build/" "/output/"
+
         echo "** Finished **"
     else
         echo "** /output does not exist **"

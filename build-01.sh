@@ -21,7 +21,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install -yy --force-yes python zip automa
 mkdir -p /build
 
 function build_openssl() {
-    cd /build
+    cd /build 
 
     # Download OpenSSL
     curl -LO https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz -k
