@@ -97,7 +97,8 @@ function doit() {
 
         # zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}.zip" $OUT_DIR || true
         # rm -rfv /build/nmap-${NMAP_VERSION}/nmap-header-template.cc
-        # zip -rv "/output/nmap-build-files_v${NMAP_VERSION}_${DATE_TIME}.zip" "/build/" "/output/" || true
+        zip -rv "/output/nmap-build-files_v${NMAP_VERSION}_${DATE_TIME}.zip" "/build/" "/output/" || true
+        tar -czvf "/output/nmap-build-files_v${NMAP_VERSION}_${DATE_TIME}.tgz" "/build/" "/output/" || true
 
 
         echo "** Finished **"

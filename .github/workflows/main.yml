@@ -46,3 +46,22 @@ jobs:
                 asset_name: nmap-static-binaries_v${{ env.NMAP_VERSION }}_${{ env.NOW }}.tgz
                 tag: v${{ env.NMAP_VERSION }}_${{ env.NOW }}
                 body: "Nmap Static Binary Release - ${{ env.NMAP_VERSION }} - ${{ env.NOW }}"
+
+
+            - name: Upload build stuff zip to release
+              uses: svenstaro/upload-release-action@v2
+              with:
+                repo_token: ${{ secrets.GITHUB_TOKEN }}
+                file: ${{ github.workspace }}/output/nmap-build-files_v${{ env.NMAP_VERSION }}_${{ env.NOW }}.zip
+                asset_name: nmap-build-files_v${{ env.NMAP_VERSION }}_${{ env.NOW }}.zip
+                tag: v${{ env.NMAP_VERSION }}_${{ env.NOW }}
+                body: "Nmap Static Binary Release - ${{ env.NMAP_VERSION }} - ${{ env.NOW }}"
+
+            - name: Upload build stuff tgz to release
+              uses: svenstaro/upload-release-action@v2
+              with:
+                repo_token: ${{ secrets.GITHUB_TOKEN }}
+                file: ${{ github.workspace }}/output/nmap-build-files_v${{ env.NMAP_VERSION }}_${{ env.NOW }}.tgz
+                asset_name: nmap-build-files_v${{ env.NMAP_VERSION }}_${{ env.NOW }}.tgz
+                tag: v${{ env.NMAP_VERSION }}_${{ env.NOW }}
+                body: "Nmap Static Binary Release - ${{ env.NMAP_VERSION }} - ${{ env.NOW }}"
