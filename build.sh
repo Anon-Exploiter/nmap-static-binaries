@@ -15,7 +15,7 @@ echo "deb http://archive.debian.org/debian jessie main" >> /etc/apt/sources.list
 
 # Install Python and zip
 DEBIAN_FRONTEND=noninteractive apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install -yy python zip
+DEBIAN_FRONTEND=noninteractive apt-get install --force-yes -yy python zip 
 
 
 function build_openssl() {
