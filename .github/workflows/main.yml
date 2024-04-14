@@ -18,7 +18,7 @@ jobs:
 
             - name: Run the Docker Image
               run: |
-                  docker.exe run -it --rm -v ${{ github.workspace }}/output:/output nmap-static
+                  docker run -it --rm -v ${{ github.workspace }}/output:/output nmap-static
 
             # - name: Run the build process with Docker
             #   uses: addnab/docker-run-action@v3
