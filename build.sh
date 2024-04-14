@@ -60,7 +60,7 @@ function build_nmap() {
 }
 
 function doit() {
-    # build_openssl
+    build_openssl
     build_nmap
 
     # Copy to output
