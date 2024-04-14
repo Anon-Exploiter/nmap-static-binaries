@@ -17,6 +17,8 @@ echo "deb http://archive.debian.org/debian jessie main" >> /etc/apt/sources.list
 DEBIAN_FRONTEND=noninteractive apt-get update -y
 DEBIAN_FRONTEND=noninteractive apt-get install -yy --force-yes python zip
 
+# Create build dir for workflows
+mkdir -p /build
 
 function build_openssl() {
     cd /build
