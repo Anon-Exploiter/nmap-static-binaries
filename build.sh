@@ -76,7 +76,7 @@ function doit() {
 
         cp /build/nmap-${NMAP_VERSION}/nmap $OUT_DIR/
         cp /build/nmap-${NMAP_VERSION}/ncat/ncat $OUT_DIR/
-        cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/
+        # cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/
 
         rm -rfv /build/nmap/nmap-header-template.cc
         cp /build/nmap/nmap-* $OUT_DIR/

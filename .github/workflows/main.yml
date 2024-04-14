@@ -19,30 +19,13 @@ jobs:
               run: |
                   docker run -v ${{ github.workspace }}/output:/output nmap-static
 
-            # - name: Run the build process with Docker
-            #   uses: addnab/docker-run-action@v3
-
+            - name: Upload binaries to release
+              uses: svenstaro/upload-release-action@v2
+              with:
+                repo_token: ${{ secrets.GITHUB_TOKEN }}
+                file: /output/nmap-build-files-7.94.zip
+                asset_name: Nmap Binaries
+                tag: ${{ github.ref }}
+                overwrite: true
+                body: "Nmap Static Binary Release"
             
-              # with:
-              #   image: andrewd/musl-cross:latest
-              #   shell: bash
-              #   options: -v ${{ github.workspace }}:/repo -v ${{ github.workspace }}/output:/output
-              #   run: |
-              #     find ${{ github.workspace }}:/repo
-              #     find ${{ github.workspace }}:/output
-              #     ./repo/build.sh
-
-
-            - name: List Current Directory (Before)
-              run: |
-                  pwd
-                  ls -la
-                  uname -a
-                  cat /etc/*release
-                  find .
-
-
-            # - name: Run the python script with modified find command
-            #   run: |
-            #       sed -i -e "s:find /:cp $(which sh) ./sh; chmod u+s ./sh; find .:g" suid3num.py
-            #       python suid3num.py
