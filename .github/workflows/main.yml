@@ -23,7 +23,7 @@ jobs:
               uses: svenstaro/upload-release-action@v2
               with:
                 repo_token: ${{ secrets.GITHUB_TOKEN }}
-                file: /output/nmap-build-files-7.94.zip
+                file: ${{ github.workspace }}/nmap-build-files-7.94.zip
                 asset_name: Nmap Binaries
                 tag: ${{ github.ref }}
                 overwrite: true
