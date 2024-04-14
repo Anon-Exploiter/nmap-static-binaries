@@ -5,9 +5,11 @@ set -o pipefail
 set -x
 
 NMAP_VERSION=workflow_fills_me
+DATE_TIME="fill_me_daddy"
 OPENSSL_VERSION=1.1.0h
 
 echo $NMAP_VERSION
+echo $DATE_TIME
 
 # Fix jessie repo
 rm -rfv /etc/apt/sources.list
@@ -69,8 +71,6 @@ function doit() {
     build_openssl
     build_nmap
 
-    DATE_TIME=`date "+%d-%m-%Y_%H-%M-%S"`
-
     # Copy to output
     if [ -d /output ]
     then
@@ -82,7 +82,7 @@ function doit() {
         cp /build/nmap-${NMAP_VERSION}/{nmap-os-db,nmap-payloads,nmap-rpc} $OUT_DIR/ || true
         cp /build/nmap-${NMAP_VERSION}/nmap-* $OUT_DIR/ || true
 
-        zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}.zip" $OUT_DIR || true
+        zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}.zip" $OUT_DIR || true
 
 
         # zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}.zip" $OUT_DIR || true
