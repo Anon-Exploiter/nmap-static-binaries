@@ -20,10 +20,9 @@ jobs:
                 shell: bash
                 options: -v ${{ github.workspace }}:/repo -v ${{ github.workspace }}/output:/output
                 run: |
-                    ls -la
-                    pwd
-                    find .
-                    ./repo/build.sh
+                  find ${{ github.workspace }}:/repo
+                  find ${{ github.workspace }}:/output
+                  ./repo/build.sh
 
 
             - name: List Current Directory (Before)
