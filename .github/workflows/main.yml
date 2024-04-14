@@ -22,6 +22,7 @@ jobs:
                 run: |
                     ls -la
                     pwd
+                    ls -la /output/
 
                     bash /output/build.sh
 

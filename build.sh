@@ -4,11 +4,12 @@ set -e
 set -o pipefail
 set -x
 
+mkdir -p /build
+
 
 #NMAP_VERSION=7.91
 # Nmap is bleeding edge from git
 OPENSSL_VERSION=1.1.1q
-
 
 function build_openssl() {
     cd /build
@@ -30,14 +31,11 @@ function build_nmap() {
     cd /build
 
     # Install Python
-    DEBIAN_FRONTEND=noninteractive apt-get update
-    DEBIAN_FRONTEND=noninteractive apt-get install -yy python
+    # DEBIAN_FRONTEND=noninteractive apt-get update
+    # DEBIAN_FRONTEND=noninteractive apt-get install -yy python
 
-    # Download
-    #curl -LOk http://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2
-    #tar xjvf nmap-${NMAP_VERSION}.tar.bz2
-    #cd nmap-${NMAP_VERSION}
-	git clone https://github.com/nmap/nmap.git
+
+	git clone https://github.com/nmap/nmap.git --depth 1
 	cd nmap
 
     # Configure
@@ -62,7 +60,7 @@ function build_nmap() {
 }
 
 function doit() {
-    build_openssl
+    # build_openssl
     build_nmap
 
     # Copy to output
