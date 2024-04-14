@@ -89,10 +89,10 @@ function doit() {
         static_bin="/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}"
 
         # zip this shit
-        zip -rv "${static_bin}.zip" $OUT_DIR/linux/x86_64 || true
+        zip -rv "${static_bin}.zip" $OUT_DIR || true
 
         # tar it as well
-        tar -czvf "${static_bin}.tgz" $OUT_DIR/linux/x86_64 || true
+        tar -czvf "${static_bin}.tgz" $OUT_DIR || true
 
 
         # zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}.zip" $OUT_DIR || true
