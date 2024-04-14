@@ -80,9 +80,11 @@ function doit() {
         rm -rfv /build/nmap-${NMAP_VERSION}/nmap-${NMAP_VERSION}-1.spec || true
         cp /build/nmap-${NMAP_VERSION}/nmap-* $OUT_DIR/ || true
     
-        # Need these two for sC/sV
+        # Need these for sC/sV
         cp -rv /build/nmap-${NMAP_VERSION}/scripts $OUT_DIR/ || true
         cp -rv /build/nmap-${NMAP_VERSION}/nselib $OUT_DIR/ || true
+        cp -rv /build/nmap-${NMAP_VERSION}/nse_main.lua $OUT_DIR/ || true
+
 
         static_bin="/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}"
 
