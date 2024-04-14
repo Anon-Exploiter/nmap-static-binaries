@@ -4,10 +4,10 @@ set -e
 set -o pipefail
 set -x
 
-echo $NMAP_VERSION
-
-# NMAP_VERSION=7.94
+NMAP_VERSION=workflow_fills_me
 OPENSSL_VERSION=1.1.0h
+
+echo $NMAP_VERSION
 
 # Fix jessie repo
 rm -rfv /etc/apt/sources.list

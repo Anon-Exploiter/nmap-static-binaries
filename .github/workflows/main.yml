@@ -20,6 +20,7 @@ jobs:
 
             - name: Build the Docker Image
               run: |
+                  sed -i -e 's/workflow_fills_me/${{ env.NMAP_VERSION }}/g' build.sh
                   docker build . -t nmap-static
 
             - name: Run the Docker Image
@@ -30,7 +31,7 @@ jobs:
               uses: svenstaro/upload-release-action@v2
               with:
                 repo_token: ${{ secrets.GITHUB_TOKEN }}
-                file: ${{ github.workspace }}/output/nmap-static-binaries_v${NMAP_VERSION}.zip
-                asset_name: Nmap Binaries
-                tag: v7.94
+                file: ${{ github.workspace }}/output/nmap-static-binaries_v${{ env.NMAP_VERSION }}.zip
+                asset_name: nmap-static-binaries_v${{ env.NMAP_VERSION }}.zip
+                tag: v${{ env.NMAP_VERSION }}
                 body: "Nmap Static Binary Release"
