@@ -71,7 +71,8 @@ function doit() {
     # Copy to output
     if [ -d /output ]
     then
-        OUT_DIR=/output/`uname | tr 'A-Z' 'a-z'`/`uname -m`
+        # OUT_DIR=/output/`uname | tr 'A-Z' 'a-z'`/`uname -m`
+        OUT_DIR=/output/
         mkdir -p $OUT_DIR
 
         cp /build/nmap-${NMAP_VERSION}/nmap $OUT_DIR/
@@ -93,7 +94,6 @@ function doit() {
 
         # tar it as well
         tar -czvf "${static_bin}.tgz" $OUT_DIR || true
-
 
         # zip -rv "/output/nmap-static-binaries_v${NMAP_VERSION}_${DATE_TIME}.zip" $OUT_DIR || true
         # rm -rfv /build/nmap-${NMAP_VERSION}/nmap-header-template.cc
