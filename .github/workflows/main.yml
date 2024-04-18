@@ -15,7 +15,7 @@ on: push
 #         type: string
 
 env:
-  NMAP_VERSION: '7.94-1'
+  NMAP_VERSION: '7.94'
 
 jobs:
     build:
