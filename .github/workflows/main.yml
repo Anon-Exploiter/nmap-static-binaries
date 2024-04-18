@@ -2,8 +2,20 @@ name: Generate and release Nmap build
 
 on: push
 
+# on: 
+#   push:
+#     branches:
+#       - master
+#   workflow_dispatch:
+#     inputs:
+#       NMAP_VERSION:
+#         description: "Nmap Version"
+#         default: "7.94"
+#         required: true
+#         type: string
+
 env:
-  NMAP_VERSION: '7.94'
+  NMAP_VERSION: '7.94-1'
 
 jobs:
     build:
